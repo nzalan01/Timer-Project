@@ -28,11 +28,11 @@
       justify-content: space-between;
       width: 96%;
       position: absolute;
-      top: 54px;
+      top: 5px;
     }
     .timer {
       font-weight: bold;
-      font-size: 150px;
+      font-size: 140px;
       color: limegreen;
       text-align: center;
       flex-grow: 2;
@@ -54,7 +54,7 @@
     }
     .event-container {
       position: absolute;
-      top: 270px;
+      top: 150px;
       left: 40px;
       width: 1152px;
       display: flex;
@@ -75,6 +75,9 @@
       font-size: 58px;
       font-weight: bold;
       color: white;
+    }
+    .now .title-card__title {
+      color: limegreen;
     }
     .title-card__label {
       font-size: 48px;
@@ -147,7 +150,8 @@
       }
       
       if (message.type === "ontime-eventNow" && message.payload && message.payload.title) {
-        document.querySelector("#nowMessage .title-card__title").innerText = message.payload.title;
+        const nowTitleElement = document.querySelector("#nowMessage .title-card__title");
+        nowTitleElement.innerText = message.payload.title;
       }
       
       if (message.type === "ontime-eventNext" && message.payload && message.payload.title) {
