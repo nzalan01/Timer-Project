@@ -8,7 +8,7 @@
     body {
       font-family: Arial, sans-serif;
       margin: 0;
-      padding: 0;
+      padding: 0 10px 0 10px;
       background-color: #000;
       color: #fff;
       text-align: center;
@@ -33,16 +33,18 @@
       display: flex;
       width: 100%;
       align-items: center;
-      justify-content: space-between;
+      position: relative;
     }
     
     .timer {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
       font-weight: bold;
       font-size: 140px;
       color: limegreen;
       text-align: center;
-      flex-grow: 2;
-      margin: 0 40px;
+      margin: 0;
     }
     .aux-timer, .clock {
       font-size: 130px;
@@ -80,7 +82,7 @@
       align-items: center;
     }
     .title-card__title {
-      font-size: 65px;
+      font-size: 90px;
       font-weight: bold;
       color: white;
       text-align: left;
@@ -91,7 +93,7 @@
       color: limegreen;
     }
     .title-card__label {
-      font-size: 65px;
+      font-size: 75px;
       font-weight: bold;
     }
     .now .title-card__label {
