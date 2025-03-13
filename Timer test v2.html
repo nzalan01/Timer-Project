@@ -23,12 +23,32 @@
     }
     .timer-container {
       display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: space-between;
+      flex-direction: column;
+      align-items: flex-start;
       width: 96%;
       position: absolute;
       top: 5px;
+    }
+    .timer-row {
+      display: flex;
+      width: 100%;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .now-row {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-top: 20px;
+      margin-left: 40px;
+    }
+    .now-label {
+      font-size: 48px;
+      font-weight: bold;
+    }
+    .now-content {
+      font-size: 58px;
+      font-weight: bold;
     }
     .timer {
       font-weight: bold;
@@ -97,16 +117,18 @@
 </head>
 <body>
   <div class="timer-container">
-    <div id="timeOfDay" class="clock"></div>
-    <div id="mainTimer" class="timer"></div>
-    <div id="auxTimer" class="aux-timer"></div>
+    <div class="timer-row">
+      <div id="timeOfDay" class="clock"></div>
+      <div id="mainTimer" class="timer"></div>
+      <div id="auxTimer" class="aux-timer"></div>
+    </div>
+    <div class="now-row">
+      <span id="nowLabel" class="now-label">NOW</span>
+      <span id="nowContent" class="now-content">Loading...</span>
+    </div>
   </div>
   
   <div class="event-container">
-    <div id="nowMessage" class="title-card now">
-      <span class="title-card__title">Loading...</span>
-      <span class="title-card__label">NOW</span>
-    </div>
     <div id="nextMessage" class="title-card next">
       <span class="title-card__title">Loading...</span>
       <span class="title-card__label">NEXT</span>
@@ -143,8 +165,14 @@
 
       if (message.type === "ontime-timer" && message.payload && typeof message.payload.current === "number") {
         const mainTimerElement = document.getElementById("mainTimer");
+        const nowLabel = document.getElementById("nowLabel");
+        const nowContent = document.getElementById("nowContent");
+        const timerColor = message.payload.current < 0 ? "red" : "limegreen";
+        
         mainTimerElement.innerText = formatTime(message.payload.current);
-        mainTimerElement.style.color = message.payload.current < 0 ? "red" : "limegreen";
+        mainTimerElement.style.color = timerColor;
+        nowLabel.style.color = timerColor;
+        nowContent.style.color = timerColor;
       }
       
       if (message.type === "ontime-auxtimer1" && message.payload && typeof message.payload.current === "number") {
@@ -154,8 +182,7 @@
       }
       
       if (message.type === "ontime-eventNow" && message.payload && message.payload.title) {
-        const nowTitleElement = document.querySelector("#nowMessage .title-card__title");
-        nowTitleElement.innerText = message.payload.title;
+        document.getElementById("nowContent").innerText = message.payload.title;
       }
       
       if (message.type === "ontime-eventNext" && message.payload && message.payload.title) {
