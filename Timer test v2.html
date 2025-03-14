@@ -23,32 +23,12 @@
     }
     .timer-container {
       display: flex;
-      flex-direction: column;
-      align-items: flex-start;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
       width: 96%;
       position: absolute;
       top: 5px;
-    }
-    .timer-row {
-      display: flex;
-      width: 100%;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .now-row {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      margin-top: 20px;
-      margin-left: 40px;
-    }
-    .now-label {
-      font-size: 48px;
-      font-weight: bold;
-    }
-    .now-content {
-      font-size: 58px;
-      font-weight: bold;
     }
     .timer {
       font-weight: bold;
@@ -76,19 +56,18 @@
       position: absolute;
       top: 150px;
       left: 40px;
-      width: 1000px;
+      width: 1152px;
       display: flex;
       flex-direction: column;
       align-items: flex-start;
       gap: 10px;
     }
     .title-card {
-      width: 1000px;
+      width: 1152px;
       background-color: #222;
       padding: 15px;
       border-radius: 10px;
       display: flex;
-      flex-direction: row-reverse;
       justify-content: space-between;
       align-items: center;
     }
@@ -96,39 +75,31 @@
       font-size: 58px;
       font-weight: bold;
       color: white;
-      text-align: right;
-      flex-grow: 1;
-      margin-left: 20px;
-    }
-    .now .title-card__title {
-      color: limegreen;
     }
     .title-card__label {
       font-size: 48px;
       font-weight: bold;
     }
     .now .title-card__label {
-      color: white;
+      color: red;
     }
     .next .title-card__label {
-      color: red;
+      color: gray;
     }
   </style>
 </head>
 <body>
   <div class="timer-container">
-    <div class="timer-row">
-      <div id="timeOfDay" class="clock"></div>
-      <div id="mainTimer" class="timer"></div>
-      <div id="auxTimer" class="aux-timer"></div>
-    </div>
-    <div class="now-row">
-      <span id="nowLabel" class="now-label">NOW</span>
-      <span id="nowContent" class="now-content">Loading...</span>
-    </div>
+    <div id="timeOfDay" class="clock"></div>
+    <div id="mainTimer" class="timer"></div>
+    <div id="auxTimer" class="aux-timer"></div>
   </div>
   
   <div class="event-container">
+    <div id="nowMessage" class="title-card now">
+      <span class="title-card__title">Loading...</span>
+      <span class="title-card__label">NOW</span>
+    </div>
     <div id="nextMessage" class="title-card next">
       <span class="title-card__title">Loading...</span>
       <span class="title-card__label">NEXT</span>
@@ -165,14 +136,8 @@
 
       if (message.type === "ontime-timer" && message.payload && typeof message.payload.current === "number") {
         const mainTimerElement = document.getElementById("mainTimer");
-        const nowLabel = document.getElementById("nowLabel");
-        const nowContent = document.getElementById("nowContent");
-        const timerColor = message.payload.current < 0 ? "red" : "limegreen";
-        
         mainTimerElement.innerText = formatTime(message.payload.current);
-        mainTimerElement.style.color = timerColor;
-        nowLabel.style.color = timerColor;
-        nowContent.style.color = timerColor;
+        mainTimerElement.style.color = message.payload.current < 0 ? "red" : "limegreen";
       }
       
       if (message.type === "ontime-auxtimer1" && message.payload && typeof message.payload.current === "number") {
@@ -182,7 +147,7 @@
       }
       
       if (message.type === "ontime-eventNow" && message.payload && message.payload.title) {
-        document.getElementById("nowContent").innerText = message.payload.title;
+        document.querySelector("#nowMessage .title-card__title").innerText = message.payload.title;
       }
       
       if (message.type === "ontime-eventNext" && message.payload && message.payload.title) {
