@@ -128,7 +128,7 @@
       const ampm = now.getHours() >= 12 ? 'PM' : 'AM';
       document.getElementById("timeOfDay").innerText = `${hours}:${minutes} ${ampm}`;
     }
-    setInterval(updateTime, 60000);
+    setInterval(updateTime, 500);
     updateTime();
 
     function formatTime(milliseconds) {
