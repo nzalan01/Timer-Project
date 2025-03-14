@@ -84,7 +84,7 @@
     .title-card__title {
       font-size: 90px;
       font-weight: bold;
-      color: white;
+      color: limegreen;
       text-align: left;
       flex-grow: 1;
       margin-left: 40px;
@@ -108,18 +108,14 @@
   <div class="timer-container">
     <div class="timer-row">
       <div id="timeOfDay" class="clock"></div>
-      <div id="mainTimer" class="timer"></div>
-      <div id="auxTimer" class="aux-timer"></div>
-    </div>
-    <div class="now-row">
-      <span id="nowLabel" class="now-label">NOW</span>
-      <span id="nowContent" class="now-content">Loading...</span>
+      <div id="mainTimer" class="timer">0:00</div>
+      <div id="auxTimer" class="aux-timer">0:00</div>
     </div>
   </div>
   
   <div class="event-container">
     <div id="nextMessage" class="title-card next">
-      <span class="title-card__title">Loading...</span>
+      <span class="title-card__title"> </span>
       <span class="title-card__label">NEXT</span>
     </div>
   </div>
@@ -152,24 +148,22 @@
       const message = JSON.parse(event.data);
       console.log("Received WebSocket message:", message);
 
-      if (message.type === "ontime-timer" && message.payload && typeof message.payload.current === "number") {
+      if (message.type === "ontime-timer") {
         const mainTimerElement = document.getElementById("mainTimer");
-        const nowLabel = document.getElementById("nowLabel");
-        const nowContent = document.getElementById("nowContent");
         const nextTitleElement = document.querySelector("#nextMessage .title-card__title");
-        const timerColor = message.payload.current < 0 ? "red" : "limegreen";
+        const current = message.payload?.current ?? 0;
+        const timerColor = current < 0 ? "red" : "limegreen";
         
-        mainTimerElement.innerText = formatTime(message.payload.current);
+        mainTimerElement.innerText = formatTime(current);
         mainTimerElement.style.color = timerColor;
-        nowLabel.style.color = timerColor;
-        nowContent.style.color = timerColor;
         nextTitleElement.style.color = timerColor;
       }
       
-      if (message.type === "ontime-auxtimer1" && message.payload && typeof message.payload.current === "number") {
+      if (message.type === "ontime-auxtimer1") {
         const auxTimerElement = document.getElementById("auxTimer");
-        auxTimerElement.innerText = formatTime(message.payload.current);
-        auxTimerElement.style.color = message.payload.current < 0 ? "red" : "orange";
+        const current = message.payload?.current ?? 0;
+        auxTimerElement.innerText = formatTime(current);
+        auxTimerElement.style.color = current < 0 ? "red" : "orange";
       }
       
       if (message.type === "ontime-eventNow" && message.payload && message.payload.title) {
