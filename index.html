@@ -123,6 +123,12 @@
   </div>
 
   <script>
+    // Parse WebSocket address from query parameter or use default
+    const urlParams = new URLSearchParams(window.location.search);
+    const wsAddress = urlParams.get('ws') || '127.0.0.1:4001';
+    const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsUrl = `${wsProtocol}//${wsAddress}/ws`;
+
     function updateTime() {
       const now = new Date();
       const hours = now.getHours() % 12 || 12;
@@ -140,7 +146,7 @@
       return `${totalSeconds < 0 ? '- ' : ''}${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
     }
 
-    const ws = new WebSocket('ws:127.0.0.1:4001/ws');
+    const ws = new WebSocket(wsUrl);
 
     ws.onopen = () => {
       console.log('Connected to Ontime WebSocket');
