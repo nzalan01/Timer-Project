@@ -1,9 +1,11 @@
 Custom view HTML page for Ontime timers. Replicates the way LIFE currently uses ProPresenter7 cue screen display.
 
-To use, download the HTML file and move it into the documents folder. Open the file and copy the address. Edit the Stage Display in PP7 and create a 1920x1080 box. Choose fill as "Web" and paste the address.
+To use, download the HTML file and move it into the Pro Presenter folder in the documents folder. Open the file and copy the address. Edit the Stage Display in PP7 and create a 1920x1080 box. Choose fill as "Web" and paste the address.
+Support added for a variable Ontime Server address. Append file address with ?ws=ip_address:4001 
+Example if IP address is 127.0.0.1 (local host): file:///Users/cg/Documents/ProPresenter/index.html?ws=127.0.0.1:4001
 
  
  
 **Known bugs:**
 
-When first opening the HTML page, "Loading..." will show in the NEXT event container. As soon as a new timer has been started this will update.
+When first opening the HTML page, the NEXT event container will not show any text. As soon as a new timer has been started or the text is edited this will update.
