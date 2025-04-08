@@ -126,7 +126,7 @@
     // Parse WebSocket address from query parameter or use default
     const urlParams = new URLSearchParams(window.location.search);
     const wsAddress = urlParams.get('ws') || '127.0.0.1:4001';
-    const wsUrl = `ws://${wsAddress}/ws`;
+    const wsUrl = `/ws`;
 
     function updateTime() {
       const now = new Date();
