@@ -7,5 +7,4 @@ Example if IP address is 127.0.0.1 (local host): file:///Users/cg/Documents/ProP
  
  
 **Known bugs:**
-
-When first opening the HTML page, the NEXT event container will not show any text. As soon as a new timer has been started or the text is edited this will update.
+- 
