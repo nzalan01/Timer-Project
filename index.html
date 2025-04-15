@@ -103,9 +103,24 @@
     .next .title-card__label {
       color: white;
     }
+    .connection-status {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background-color: red;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .connection-status.disconnected {
+      opacity: 1;
+    }
   </style>
 </head>
 <body>
+  <div id="connectionStatus" class="connection-status"></div>
   <div class="timer-container">
     <div class="timer-row">
       <div id="timeOfDay" class="clock"></div>
@@ -168,6 +183,7 @@
 
     ws.onopen = () => {
       console.log('Connected to Ontime WebSocket');
+      document.getElementById('connectionStatus').classList.remove('disconnected');
     };
 
     ws.onmessage = (event) => {
@@ -217,6 +233,7 @@
 
     ws.onclose = () => {
       console.log('Disconnected from Ontime WebSocket');
+      document.getElementById('connectionStatus').classList.add('disconnected');
     };
   </script>
 </body>
