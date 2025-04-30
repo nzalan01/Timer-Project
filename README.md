@@ -13,5 +13,4 @@ Macintosh HD/Users/{username}/Library/Application Support/Ontime/external/{your 
  The index.html file is placed inside this folder.
  The page can then be accessed at http://ip-address:4001/external/cuescreen 
  
-**Known bugs:**
-- 
+To integrate with ProPresenter, create a rectangle that fills the stage display you want to use, then choose "Web Fill" and paste the URL of the page. Note that sometimes PP7 requires a restart to pull the infomation from the page correctly.
