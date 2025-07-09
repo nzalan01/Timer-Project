@@ -117,6 +117,11 @@
     .connection-status.disconnected {
       opacity: 1;
     }
+
+    /* Hide the NOW event visually while keeping it in the DOM */
+    #nowMessage {
+      display: none !important;
+    }
   </style>
 </head>
 <body>
@@ -126,10 +131,15 @@
       <div id="timeOfDay" class="clock"></div>
       <div id="mainTimer" class="timer">0:00</div>
       <div id="auxTimer" class="aux-timer">0:00</div>
+      <div id="auxMirror" class="aux-timer" style="display: none;"></div>
     </div>
   </div>
   
   <div class="event-container">
+    <div id="nowMessage" class="title-card now">
+      <span class="title-card__title"> </span>
+      <span class="title-card__label">NOW: </span>
+    </div>
     <div id="nextMessage" class="title-card next">
       <span class="title-card__title"> </span>
       <span class="title-card__label">NEXT: </span>
@@ -163,7 +173,7 @@
      * @param message {string} - The message to set.
      */
     function updateNowMessage(message) {
-      const element = document.getElementById("nowContent");
+      const element = document.querySelector("#nowMessage .title-card__title");
       if (element) {
         element.innerText = message;
       }
@@ -192,13 +202,30 @@
 
       if (message.type === "ontime-timer") {
         const mainTimerElement = document.getElementById("mainTimer");
-        const nextTitleElement = document.querySelector("#nextMessage .title-card__title");
+        const auxTimerElement = document.getElementById("auxTimer");
+        const nowTitleElement = document.querySelector("#nowMessage .title-card__title");
         const current = message.payload?.current ?? 0;
         const timerColor = current < 0 ? "red" : "limegreen";
         
         mainTimerElement.innerText = formatTime(current);
         mainTimerElement.style.color = timerColor;
-        nextTitleElement.style.color = timerColor;
+        nowTitleElement.style.color = timerColor;
+        document.querySelector("#nextMessage .title-card__title").style.color = timerColor;
+        const nowTitleText = nowTitleElement.innerText.trim();
+        const auxMirrorElement = document.getElementById("auxMirror");
+        if (nowTitleText === "Altar Call") {
+          // Hide real aux timer, show mirror with main timer value and color logic
+          auxTimerElement.style.display = "none";
+          auxMirrorElement.style.display = "block";
+          const auxColor = current < 0 ? "red" : "orange";
+          auxMirrorElement.innerText = formatTime(current);
+          auxMirrorElement.style.color = auxColor;
+          mainTimerElement.innerText = "0:00";
+        } else {
+          // Restore regular aux timer display
+          auxTimerElement.style.display = "block";
+          auxMirrorElement.style.display = "none";
+        }
       }
       
       if (message.type === "ontime-auxtimer1") {
