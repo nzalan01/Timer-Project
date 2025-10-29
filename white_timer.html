@@ -35,22 +35,27 @@ const el = document.getElementById('timer');
 const state = { totalMs: 5*60_000, remainingMs: 5*60_000, status:'Running' };
 
 function fmt(ms){
-  const neg = ms < 0; ms = Math.abs(ms);
-  const h = Math.floor(ms / 3600000);
-  const m = Math.floor((ms % 3600000) / 60000);
-  const s = Math.floor((ms % 60000) / 1000);
-  let formatted;
-  if (h > 0) {
-    formatted = `${h}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
-  } else {
-    formatted = `${m}:${s.toString().padStart(2,'0')}`;
-  }
-  return (neg ? '-' : '') + formatted;
+  // Quantize seconds: floor for +, ceil for - to avoid "-0"
+  const signedSeconds = Math.floor(ms / 1000);
+  const neg = signedSeconds < 0;
+  const abs = Math.abs(signedSeconds);
+
+  const h = Math.floor(abs / 3600);
+  const m = Math.floor((abs % 3600) / 60);
+  const s = abs % 60;
+
+  const body = h > 0
+    ? `${h}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`
+    : `${m}:${s.toString().padStart(2,'0')}`;
+
+  return (neg ? '-' : '') + body;
 }
 
 function render(){
   el.textContent = fmt(state.remainingMs);
-  el.classList.toggle('red', state.remainingMs < 0);
+  // Use quantized sign (floor for +, ceil for -) to avoid "-0" wobble and 1s offset
+  const signedSeconds = Math.floor(state.remainingMs / 1000);
+  el.classList.toggle('red', signedSeconds < 0);
 }
 
 function tick(){
