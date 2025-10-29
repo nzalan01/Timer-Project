@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Big Timer</title>
+<style>
+  html,body {
+    height:100%; margin:0;
+    background:transparent; color:#ffffff;
+    font-family: 'Inter', 'SF Pro Display', sans-serif;
+    display:flex; align-items:center; justify-content:center;
+    overflow:hidden;
+  }
+  #timer {
+    font-variant-numeric: tabular-nums;
+    font-weight:900;
+    letter-spacing:2px;
+    font-size:18vw;
+    text-align:center;
+    user-select:none;
+    transition:color 0.3s ease;
+  }
+  #timer.red { color:#ff4040; }
+</style>
+</head>
+<body>
+  <div id="timer">00:00</div>
+<script>
+const qs = new URLSearchParams(location.search);
+const wsURL = qs.get('ws') || 'ws://10.11.32.105:4001/ws';
+const demo = qs.has('demo');
+
+const el = document.getElementById('timer');
+const state = { totalMs: 5*60_000, remainingMs: 5*60_000, status:'Running' };
+
+function fmt(ms){
+  const neg = ms < 0; ms = Math.abs(ms);
+  const h = Math.floor(ms / 3600000);
+  const m = Math.floor((ms % 3600000) / 60000);
+  const s = Math.floor((ms % 60000) / 1000);
+  let formatted;
+  if (h > 0) {
+    formatted = `${h}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+  } else {
+    formatted = `${m}:${s.toString().padStart(2,'0')}`;
+  }
+  return (neg ? '-' : '') + formatted;
+}
+
+function render(){
+  el.textContent = fmt(state.remainingMs);
+  el.classList.toggle('red', state.remainingMs < 0);
+}
+
+let last = performance.now();
+function tick(t){
+  const dt = t - last; last = t;
+  if (state.status === 'Running') state.remainingMs -= dt;
+  render();
+  requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+
+if (demo){
+  // Runs locally without WS connection
+  render();
+} else {
+  let ws;
+  function connect(){
+    ws = new WebSocket(wsURL);
+    ws.onopen = ()=>console.log('[WS] connected');
+    ws.onclose = ()=>setTimeout(connect,1500);
+    ws.onerror = ()=>ws.close();
+    ws.onmessage = e=>{
+      try {
+        const m = JSON.parse(e.data);
+        // Preferred: Ontime "ontime-timer" messages (reference implementation)
+        if (m.type === 'ontime-timer' && m.payload) {
+          const cur = Number(m.payload.current);
+          if (!Number.isNaN(cur)) state.remainingMs = cur;
+          // Optional: if Ontime provides status, track it
+          if (typeof m.payload.status === 'string') state.status = m.payload.status;
+          return;
+        }
+        // Fallback: older/simple schema { type:'timer', remainingMs, totalMs, status }
+        if (m.type === 'timer') {
+          if (typeof m.remainingMs === 'number') state.remainingMs = m.remainingMs;
+          if (typeof m.totalMs === 'number') state.totalMs = m.totalMs;
+          if (typeof m.status === 'string') state.status = m.status;
+          return;
+        }
+        // Initial runtime payload (optional). If present, try to pick current value.
+        // Some Ontime endpoints send { type:'ontime', payload:{ timer:{ current: ... } } }
+        if (m.type === 'ontime' && m.payload && m.payload.timer && typeof m.payload.timer.current === 'number') {
+          state.remainingMs = m.payload.timer.current;
+          return;
+        }
+      } catch(err){
+        console.warn('Bad WS message', err);
+      }
+    };
+  }
+  connect();
+}
+</script>
+</body>
+</html>
