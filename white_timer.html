@@ -53,10 +53,7 @@ function render(){
   el.classList.toggle('red', state.remainingMs < 0);
 }
 
-let last = performance.now();
-function tick(t){
-  const dt = t - last; last = t;
-  if (state.status === 'Running') state.remainingMs -= dt;
+function tick(){
   render();
   requestAnimationFrame(tick);
 }
