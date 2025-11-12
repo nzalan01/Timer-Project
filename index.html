@@ -89,6 +89,9 @@
       text-align: left;
       flex-grow: 1;
       margin-left: 40px;
+      white-space: nowrap;
+      overflow: hidden;
+      display: inline-block;
     }
     .now .title-card__title {
       color: limegreen;
@@ -97,6 +100,7 @@
       font-size: 75px;
       font-weight: bold;
     }
+    /* NEXT title text will be auto-resized via JS to stay on one line */
     .now .title-card__label {
       color: white;
     }
@@ -169,6 +173,33 @@
       return `${totalSeconds < 0 ? '- ' : ''}${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
     }
 
+    function autoResizeNextTitle() {
+      const titleElement = document.querySelector('#nextMessage .title-card__title');
+      const container = document.getElementById('nextMessage');
+      if (!titleElement || !container) return;
+
+      // Reset font size to the base so we don't keep shrinking from an already reduced size
+      titleElement.style.fontSize = '';
+      const computedStyle = window.getComputedStyle(titleElement);
+      let fontSize = parseFloat(computedStyle.fontSize) || 90;
+      const minFontSize = 30; // px, lower bound so it doesn't become unreadable
+
+      const labelElement = container.querySelector('.title-card__label');
+      const labelWidth = labelElement ? labelElement.offsetWidth : 0;
+      const containerWidth = container.clientWidth;
+      // Some padding / gap allowance between label and title
+      const paddingAllowance = 40;
+      const availableWidth = containerWidth - labelWidth - paddingAllowance;
+
+      if (availableWidth <= 0) return;
+
+      // Shrink the font size until the text fits within the available width
+      while (titleElement.scrollWidth > availableWidth && fontSize > minFontSize) {
+        fontSize -= 1;
+        titleElement.style.fontSize = fontSize + 'px';
+      }
+    }
+
     /**
      * @param message {string} - The message to set.
      */
@@ -179,16 +210,18 @@
       }
     }
 
-    /**
-     * @param message {string} - The message to set
-     */
     function updateNextMessage(message) {
       const element = document.querySelector("#nextMessage .title-card__title");
       if (element) {
         element.innerText = message;
+        // Resize so the NEXT text fits on a single line
+        autoResizeNextTitle();
       }
     }
     
+    // Recalculate NEXT title size on window resize
+    window.addEventListener('resize', autoResizeNextTitle);
+
     const ws = new WebSocket(wsUrl);
 
     ws.onopen = () => {
